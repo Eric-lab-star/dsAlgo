@@ -1,62 +1,15 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type Node struct {
 	key   int
-	left  *Node
 	right *Node
+	left  *Node
 }
 
 type Tree struct {
 	root *Node
-}
-
-func (tree *Tree) Min() *Node {
-	if tree.root == nil {
-		return nil
-	}
-
-	for {
-		if tree.root.left == nil {
-			return tree.root
-		}
-		tree.root = tree.root.left
-	}
-}
-
-func (tree *Tree) Max() *Node {
-	if tree.root == nil {
-		return nil
-	}
-
-	for {
-		if tree.root.right == nil {
-			return tree.root
-		}
-		tree.root = tree.root.right
-	}
-
-}
-
-func (tree *Tree) Search(key int) bool {
-	return search(tree.root, key)
-}
-
-func search(root *Node, key int) bool {
-	if root == nil {
-		return false
-	}
-	if root.key < key {
-		return search(root.right, key)
-	}
-	if root.key > key {
-		return search(root.left, key)
-	}
-
-	return true
 }
 
 func (tree *Tree) Insert(key int) {
@@ -69,26 +22,67 @@ func (tree *Tree) Insert(key int) {
 }
 
 func insert(root, node *Node) {
-
-	if node.key < root.key {
+	if root.key < node.key {
+		if root.right == nil {
+			root.right = node
+		} else {
+			insert(root.right, node)
+		}
+	} else {
 		if root.left == nil {
 			root.left = node
 		} else {
 			insert(root.left, node)
 		}
 	}
-	if node.key > root.key {
-		if root.right == nil {
-			root.right = node
-		} else {
-			insert(root.right, node)
-		}
+}
+
+func (tree *Tree) String() {
+	fmt.Println("========")
+	string(tree.root, 0)
+	fmt.Println("========")
+}
+
+func string(node *Node, level int) {
+	msg := ""
+	for i := 0; i < level; i++ {
+		msg += "    "
 	}
+	msg += ">>"
+	level++
+	if node != nil {
+		string(node.right, level)
+		fmt.Printf(msg+"%d\n", node.key)
+		string(node.left, level)
+	}
+}
+
+func (tree *Tree) Search(key int) bool {
+	if tree.root != nil {
+		return search(tree.root, key)
+	}
+
+	return false
+}
+
+func search(node *Node, key int) bool {
+	if node == nil {
+		return false
+	}
+	if node.key < key {
+		return search(node.right, key)
+	}
+
+	if node.key > key {
+		return search(node.left, key)
+	}
+
+	return true
+
 }
 
 func (tree *Tree) Remove(key int) {
 	remove(tree.root, key)
-
 }
 
 func remove(node *Node, key int) *Node {
@@ -105,17 +99,15 @@ func remove(node *Node, key int) *Node {
 		return node
 	}
 
-	if node.left == nil && node.right == nil {
-		node = nil
-		return nil
+	if node.right == nil {
+		return node.left
 	}
-
 	if node.left == nil {
 		return node.right
 	}
 
-	if node.right == nil {
-		return node.left
+	if node.left == nil && node.right == nil {
+		return nil
 	}
 
 	leftmostright := node.right
@@ -130,67 +122,51 @@ func remove(node *Node, key int) *Node {
 
 	node.key = leftmostright.key
 	node.right = remove(node.right, node.key)
-
 	return node
 }
 
-func (tree *Tree) InOrder() {
-	inorder(tree.root)
-}
-
-func inorder(node *Node) {
-	if node != nil {
-		inorder(node.left)
-		fmt.Printf("%d \n", node.key)
-		inorder(node.right)
+func (tree *Tree) Min() (node *Node) {
+	if tree.root == nil {
+		return nil
 	}
-}
-
-func (tree *Tree) PreOrder() {
-
-	preorder(tree.root)
-}
-
-func preorder(node *Node) {
-	if node != nil {
-		fmt.Printf("%d\n", node.key)
-		preorder(node.left)
-		preorder(node.right)
+	root := tree.root
+	for {
+		if root.left != nil {
+			root = root.left
+		} else {
+			break
+		}
 	}
 
+	return root
+
 }
 
-func (tree *Tree) String() {
-	string(tree.root, 0)
-}
+func (tree *Tree) Max() (node *Node) {
+	if tree.root == nil {
+		return nil
+	}
+	root := tree.root
+	for {
+		if root.right != nil {
+			root = root.right
+		} else {
+			break
+		}
+	}
 
-func string(node *Node, level int) {
-	msg := ""
-	for i := 0; i < level; i++ {
-		msg += "    "
-	}
-	msg += ">>"
-	level += 1
-	if node != nil {
-		string(node.right, level)
-		fmt.Printf(msg+"%d\n", node.key)
-		string(node.left, level)
-	}
+	return root
 }
 
 func main() {
 	tree := &Tree{}
 	tree.Insert(8)
 	tree.Insert(5)
-	tree.Insert(2)
-	tree.Insert(12)
+	tree.Insert(9)
 	tree.Insert(10)
 	tree.String()
-	tree.Remove(8)
+	max := tree.Max()
+	fmt.Println(max)
 	tree.String()
-	check := tree.Search(8)
-	fmt.Println(check)
-	node := tree.Max()
-	fmt.Println(node)
-
 }
+
