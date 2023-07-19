@@ -5,97 +5,94 @@ import (
 	"fmt"
 )
 
-type TreeNode struct {
-	KeyValue     KeyValue
+type treeNode struct {
+	Key          int
 	BalanceValue int
-	LinkedNode   [2]*TreeNode
+	LinkedNodes  [2]*treeNode
 }
 
-type KeyValue int
-
-func (k KeyValue) LessThan(k1 KeyValue) bool { return k < k1 }
-
-func InsertNode(tree **TreeNode, key KeyValue) {
-	*tree, _ = InsertRNode(*tree, key)
+func InsertNode(tree **treeNode, key int) {
+	*tree, _ = insertRNode(*tree, key)
 }
 
-func InsertRNode(rootNode *TreeNode, key KeyValue) (*TreeNode, bool) {
-	if rootNode == nil {
-		return &TreeNode{KeyValue: key}, false
+func insertRNode(node *treeNode, key int) (*treeNode, bool) {
+	if node == nil {
+		node = &treeNode{Key: key}
+		return node, false
 	}
 	dir := 0
-	if rootNode.KeyValue.LessThan(key) {
+	if node.Key < key {
 		dir = 1
 	}
 	var done bool
-	rootNode.LinkedNode[dir], done = InsertRNode(rootNode.LinkedNode[dir], key)
+	node.LinkedNodes[dir], done = insertRNode(node.LinkedNodes[dir], key)
 	if done {
-		return rootNode, true
+		return node, true
 	}
-	rootNode.BalanceValue = rootNode.BalanceValue + (2*dir - 1)
-	switch rootNode.BalanceValue {
+	node.BalanceValue = node.BalanceValue + (2*dir - 1)
+	switch node.BalanceValue {
 	case 0:
-		return rootNode, true
+		return node, false
 	case 1, -1:
-		return rootNode, false
+		return node, false
 	}
-	return BalanceTree(rootNode, dir), true
+	return BalanceTree(node, dir), true
 }
 
-func BalanceTree(root *TreeNode, dir int) *TreeNode {
-	node := root.LinkedNode[dir]
+func BalanceTree(root *treeNode, dir int) *treeNode {
+	node := root.LinkedNodes[dir]
 	checker := 2*dir - 1
 	if node.BalanceValue == checker {
 		node.BalanceValue = 0
 		root.BalanceValue = 0
-		return SingleRotation(root, dir)
+		return singleRotation(root, dir)
 	}
-	adjustBalance(root, dir, checker)
+	balancer(root, checker, dir)
 	return doubleRotation(root, dir)
 }
 
-func SingleRotation(root *TreeNode, dir int) *TreeNode {
-	saveNode := root.LinkedNode[dir]
-	root.LinkedNode[dir] = saveNode.LinkedNode[1-dir]
-	saveNode.LinkedNode[1-dir] = root
-	return saveNode
+func singleRotation(root *treeNode, checker int) *treeNode {
+	save := root.LinkedNodes[checker]
+	root.LinkedNodes[checker] = save.LinkedNodes[1-checker]
+	save.LinkedNodes[1-checker] = root
+	return save
 }
 
-func adjustBalance(rootNode *TreeNode, dir int, balanceValue int) {
-	node := rootNode.LinkedNode[dir]
-	oppNode := node.LinkedNode[1-dir]
-	switch oppNode.BalanceValue {
-	case 0: //RL, LR
-		rootNode.BalanceValue = 0
+func balancer(root *treeNode, checker int, dir int) {
+	node := root.LinkedNodes[dir]
+	switch node.LinkedNodes[1-dir].BalanceValue {
+	case 0:
 		node.BalanceValue = 0
-	case balanceValue: //RLL
-		rootNode.BalanceValue = -balanceValue
+		root.BalanceValue = 0
+	case checker:
+		node.BalanceValue = -checker
+		root.BalanceValue = 0
+	default:
 		node.BalanceValue = 0
-	default: //LRR
-		rootNode.BalanceValue = 0
-		node.BalanceValue = balanceValue
+		root.BalanceValue = checker
 	}
-	oppNode.BalanceValue = 0
+	node.LinkedNodes[1-dir].BalanceValue = 0
 }
 
-func doubleRotation(rootNode *TreeNode, dir int) *TreeNode {
-	//rotation --> rotation
-	saveNode := rootNode.LinkedNode[dir].LinkedNode[1-dir]
-	rootNode.LinkedNode[dir].LinkedNode[1-dir] = saveNode.LinkedNode[dir]
-	saveNode.LinkedNode[dir] = rootNode.LinkedNode[dir]
-	rootNode.LinkedNode[dir] = saveNode
-	return SingleRotation(rootNode, dir)
+func doubleRotation(root *treeNode, dir int) *treeNode {
+	save := root.LinkedNodes[dir].LinkedNodes[1-dir]
+	root.LinkedNodes[dir].LinkedNodes[1-dir] = save.LinkedNodes[dir]
+	save.LinkedNodes[dir] = root.LinkedNodes[dir]
+	root.LinkedNodes[dir] = save
+	save = singleRotation(root, dir)
+	return save
 }
 
-func (tree *TreeNode) Print() {
-	avlTree, _ := json.MarshalIndent(tree, "", "  ")
-	fmt.Println(string(avlTree))
+func (tree *treeNode) Print() {
+	avl, _ := json.MarshalIndent(tree, "", "  ")
+	fmt.Println(string(avl))
 }
 
 func main() {
-	var tree *TreeNode
+	var tree *treeNode
 	InsertNode(&tree, 10)
-	InsertNode(&tree, 18)
-	InsertNode(&tree, 15)
+	InsertNode(&tree, 9)
+	InsertNode(&tree, 2)
 	tree.Print()
+
 }
