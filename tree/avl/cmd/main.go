@@ -18,6 +18,8 @@ func (tree *treeNode) Print() {
 		log.Panicf("Marshal Json error %v", err)
 		return
 	}
+
+	fmt.Println("=====")
 	fmt.Println(string(avl))
 }
 
@@ -94,13 +96,70 @@ func doubleRotation(root *treeNode, dir int) *treeNode {
 
 }
 
+func RemoveNode(tree **treeNode, key int) {
+	*tree, _ = removeRNode(*tree, key)
+}
+
+func removeRNode(root *treeNode, key int) (*treeNode, bool) {
+	if root == nil {
+		return nil, false
+	}
+	if root.Key == key {
+		switch {
+		case root.LinkedNodes[0] == nil:
+			return root.LinkedNodes[1], false
+		case root.LinkedNodes[1] == nil:
+			return root.LinkedNodes[0], false
+		}
+		heir := root.LinkedNodes[0]
+		for heir.LinkedNodes[1] != nil {
+			heir = heir.LinkedNodes[1]
+		}
+		root.Key = heir.Key
+		key = heir.Key
+	}
+	dir := 0
+	if root.Key < key {
+		dir = 1
+	}
+	var done bool
+	root.LinkedNodes[dir], done = removeRNode(root.LinkedNodes[dir], key)
+	if done {
+		return root, true
+	}
+	root.BalanceValue = root.BalanceValue + (1 - 2*dir)
+	switch root.BalanceValue {
+	case 0:
+		return root, false
+	case 1, -1:
+		return root, true
+	}
+	return removeBalance(root, dir)
+}
+
+func removeBalance(root *treeNode, dir int) (*treeNode, bool) {
+	node := root.LinkedNodes[1-dir]
+	checker := 2*dir - 1
+	switch root.BalanceValue {
+	case checker:
+		balancer(root, checker, dir)
+		return doubleRotation(root, dir), true
+	case -checker:
+		root.BalanceValue = 0
+		node.BalanceValue = 0
+		return singleRotation(root, dir), true
+	}
+	root.BalanceValue = -checker
+	node.BalanceValue = checker
+	return singleRotation(root, dir), true
+}
+
 func main() {
 	var tree *treeNode
-	Insert(&tree, 45)
 	Insert(&tree, 40)
-	Insert(&tree, 80)
+	Insert(&tree, 45)
 	Insert(&tree, 50)
-	Insert(&tree, 90)
-	Insert(&tree, 60)
+	tree.Print()
+	RemoveNode(&tree, 45)
 	tree.Print()
 }
