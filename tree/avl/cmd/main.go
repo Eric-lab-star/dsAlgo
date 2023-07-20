@@ -3,23 +3,21 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 )
 
 type treeNode struct {
 	Key          int
 	BalanceValue int
-	LinkedNode   [2]*treeNode
-}
-
-func errHandler(err error) {
-	if err != nil {
-		panic(err)
-	}
+	LinkedNodes  [2]*treeNode
 }
 
 func (tree *treeNode) Print() {
-	avl, err := json.MarshalIndent(tree, "  ", "    ")
-	errHandler(err)
+	avl, err := json.MarshalIndent(tree, " ", "  ")
+	if err != nil {
+		log.Panicf("Marshal Json error %v", err)
+		return
+	}
 	fmt.Println(string(avl))
 }
 
@@ -27,32 +25,32 @@ func Insert(tree **treeNode, key int) {
 	*tree, _ = insertRNode(*tree, key)
 }
 
-func insertRNode(root *treeNode, key int) (*treeNode, bool) {
-	if root == nil {
+func insertRNode(tree *treeNode, key int) (*treeNode, bool) {
+	if tree == nil {
 		return &treeNode{Key: key}, false
 	}
 	dir := 0
-	if root.Key < key {
+	if tree.Key < key {
 		dir = 1
 	}
 	var done bool
-	root.LinkedNode[dir], done = insertRNode(root.LinkedNode[dir], key)
+	tree.LinkedNodes[dir], done = insertRNode(tree.LinkedNodes[dir], key)
 	if done {
-		return root, true
+		return tree, true
 	}
-	root.BalanceValue = root.BalanceValue + (2*dir - 1)
-	switch root.BalanceValue {
+	tree.BalanceValue = tree.BalanceValue + (2*dir - 1)
+	switch tree.BalanceValue {
 	case 0:
-		return root, true
+		return tree, true
 	case 1, -1:
-		return root, false
+		return tree, false
 	}
-	return balanceTree(root, dir), false
+	return balanceTree(tree, dir), true
 }
 
 func balanceTree(root *treeNode, dir int) *treeNode {
+	node := root.LinkedNodes[dir]
 	checker := 2*dir - 1
-	node := root.LinkedNode[dir]
 	if node.BalanceValue == checker {
 		node.BalanceValue = 0
 		root.BalanceValue = 0
@@ -62,9 +60,16 @@ func balanceTree(root *treeNode, dir int) *treeNode {
 	return doubleRotation(root, dir)
 }
 
+func singleRotation(root *treeNode, dir int) *treeNode {
+	save := root.LinkedNodes[dir]
+	root.LinkedNodes[dir] = save.LinkedNodes[1-dir]
+	save.LinkedNodes[1-dir] = root
+	return save
+}
+
 func balancer(root *treeNode, checker int, dir int) {
-	save := root.LinkedNode[dir].LinkedNode[1-dir]
-	node := root.LinkedNode[dir]
+	node := root.LinkedNodes[dir]
+	save := node.LinkedNodes[1-dir]
 	switch save.BalanceValue {
 	case 0:
 		node.BalanceValue = 0
@@ -79,19 +84,14 @@ func balancer(root *treeNode, checker int, dir int) {
 	save.BalanceValue = 0
 }
 
-func singleRotation(root *treeNode, dir int) *treeNode {
-	save := root.LinkedNode[dir]
-	root.LinkedNode[dir] = save.LinkedNode[1-dir]
-	save.LinkedNode[1-dir] = root
-	return save
-}
-
 func doubleRotation(root *treeNode, dir int) *treeNode {
-	save := root.LinkedNode[dir].LinkedNode[1-dir]
-	root.LinkedNode[dir].LinkedNode[1-dir] = save.LinkedNode[dir]
-	save.LinkedNode[dir] = root.LinkedNode[dir]
-	root.LinkedNode[dir] = save
+	node := root.LinkedNodes[dir]
+	save := node.LinkedNodes[1-dir]
+	node.LinkedNodes[1-dir] = save.LinkedNodes[dir]
+	save.LinkedNodes[dir] = node
+	root.LinkedNodes[dir] = save
 	return singleRotation(root, dir)
+
 }
 
 func main() {
@@ -103,5 +103,4 @@ func main() {
 	Insert(&tree, 90)
 	Insert(&tree, 60)
 	tree.Print()
-
 }
