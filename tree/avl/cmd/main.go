@@ -93,10 +93,9 @@ func doubleRotation(root *treeNode, dir int) *treeNode {
 	save.LinkedNodes[dir] = node
 	root.LinkedNodes[dir] = save
 	return singleRotation(root, dir)
-
 }
 
-func RemoveNode(tree **treeNode, key int) {
+func Remove(tree **treeNode, key int) {
 	*tree, _ = removeRNode(*tree, key)
 }
 
@@ -135,23 +134,24 @@ func removeRNode(root *treeNode, key int) (*treeNode, bool) {
 		return root, true
 	}
 	return removeBalance(root, dir)
+	// return nil, false
 }
 
-func removeBalance(root *treeNode, dir int) (*treeNode, bool) {
-	node := root.LinkedNodes[1-dir]
+func removeBalance(rootNode *treeNode, dir int) (*treeNode, bool) {
+	node := rootNode.LinkedNodes[1-dir]
 	checker := 2*dir - 1
-	switch root.BalanceValue {
+	switch node.BalanceValue {
 	case checker:
-		balancer(root, checker, dir)
-		return doubleRotation(root, dir), true
+		balancer(rootNode, checker, dir)
+		return doubleRotation(rootNode, 1-dir), false
 	case -checker:
-		root.BalanceValue = 0
+		rootNode.BalanceValue = 0
 		node.BalanceValue = 0
-		return singleRotation(root, dir), true
+		return singleRotation(rootNode, 1-dir), false
 	}
-	root.BalanceValue = -checker
+	rootNode.BalanceValue = -checker
 	node.BalanceValue = checker
-	return singleRotation(root, dir), true
+	return singleRotation(rootNode, dir), true
 }
 
 func main() {
@@ -159,7 +159,8 @@ func main() {
 	Insert(&tree, 40)
 	Insert(&tree, 45)
 	Insert(&tree, 50)
+	Insert(&tree, 60)
 	tree.Print()
-	RemoveNode(&tree, 45)
+	Remove(&tree, 40)
 	tree.Print()
 }

@@ -35,8 +35,7 @@ func singleRotation(rootNode *TreeNode, nodeValue int) *TreeNode {
 
 // double rotation method
 func doubleRotation(rootNode *TreeNode, nodeValue int) *TreeNode {
-	var saveNode *TreeNode
-	saveNode = rootNode.LinkedNodes[opposite(nodeValue)].LinkedNodes[nodeValue]
+	saveNode := rootNode.LinkedNodes[opposite(nodeValue)].LinkedNodes[nodeValue]
 	rootNode.LinkedNodes[opposite(nodeValue)].LinkedNodes[nodeValue] = saveNode.LinkedNodes[opposite(nodeValue)]
 	saveNode.LinkedNodes[opposite(nodeValue)] = rootNode.LinkedNodes[opposite(nodeValue)]
 	rootNode.LinkedNodes[opposite(nodeValue)] = saveNode
@@ -187,11 +186,11 @@ func main() {
 	avlTree, _ = json.MarshalIndent(treeNode, "", "   ")
 	fmt.Println(string(avlTree))
 	fmt.Println("\n Add Tree")
-	InsertNode(&treeNode, integerKey(10))
-	InsertNode(&treeNode, integerKey(5))
-	InsertNode(&treeNode, integerKey(6))
-	InsertNode(&treeNode, integerKey(3))
-	InsertNode(&treeNode, integerKey(1))
+	InsertNode(&treeNode, integerKey(45))
+	InsertNode(&treeNode, integerKey(40))
+	InsertNode(&treeNode, integerKey(80))
+	InsertNode(&treeNode, integerKey(90))
+	InsertNode(&treeNode, integerKey(60))
 	avlTree, _ = json.MarshalIndent(treeNode, "", "   ")
 	fmt.Println(string(avlTree))
 }
