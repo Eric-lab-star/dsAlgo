@@ -1,0 +1,22 @@
+
+
+graph G {
+	node [shape = circle, ordering=out]
+	Null [style=invis]
+
+	Null_2 [style=invis]
+	55 -- 50
+
+	50 -- 40
+	50 -- Null[style=invis]
+	
+	60 -- Null_2[style=invis]
+    60 -- 65
+	
+	
+	55 -- 70
+	
+	70 -- 60
+	70 -- 80
+
+}

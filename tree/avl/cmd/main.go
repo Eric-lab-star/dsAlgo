@@ -132,18 +132,18 @@ func removeRNode(root *TreeNode, key int) (*TreeNode, bool) {
 	}
 	return removeBalance(root, dir)
 }
+
 func removeBalance(root *TreeNode, dir int) (*TreeNode, bool) {
-	fmt.Println("remove")
 	node := root.LinkedNodes[1-dir]
 	checker := 2*dir - 1
 	switch node.BalanceValue {
 	case -checker:
 		node.BalanceValue = 0
 		root.BalanceValue = 0
-		return singleRotation(root, 1-dir), true
+		return singleRotation(root, 1-dir), false
 	case checker:
 		balancer(root, checker, 1-dir)
-		return doubleRotation(root, 1-dir), true
+		return doubleRotation(root, 1-dir), false
 	}
 	root.BalanceValue = -checker
 	node.BalanceValue = checker
@@ -153,14 +153,10 @@ func removeBalance(root *TreeNode, dir int) (*TreeNode, bool) {
 
 func main() {
 	var tree *TreeNode
-
 	Insert(&tree, 50)
 	Insert(&tree, 40)
 	Insert(&tree, 60)
 	Insert(&tree, 55)
 	Insert(&tree, 70)
 	tree.Print()
-	Remove(&tree, 40)
-	tree.Print()
-
 }
