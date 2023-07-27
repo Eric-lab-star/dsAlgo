@@ -1,62 +1,46 @@
-// /main package has examples shown
-// in Go Data Structures and algorithms book
 package main
 
-// importing fmt package
-import (
-	"fmt"
-)
+import "fmt"
 
-// changeMatrix method
 func changeMatrix(matrix [3][3]int) [3][3]int {
-	var i int
-	var j int
-	var Rows [3]int
-	var Columns [3]int
+	row := [3]int{}
+	col := [3]int{}
 
-	var matrixChanged [3][3]int
-
-	for i = 0; i < 3; i++ {
-		for j = 0; j < 3; j++ {
-			if matrix[i][j] == 1 {
-				Rows[i] = 1
-				Columns[j] = 1
-			}
-		}
-	}
-
-	for i = 0; i < 3; i++ {
-		for j = 0; j < 3; j++ {
-			if Rows[i] == 1 || Columns[j] == 1 {
-				matrixChanged[i][j] = 1
-			}
-
-		}
-	}
-
-	return matrixChanged
-
-}
-
-// printMatrix method
-func printMatrix(matrix [3][3]int) {
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
-			fmt.Printf("%d", matrix[i][j])
+			if matrix[i][j] == 1 {
+				row[i] = 1
+				col[i] = 1
+			}
 		}
-		fmt.Printf("\n")
 	}
 
+	changed := [3][3]int{}
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			if row[i] == 1 || col[j] == 1 {
+				changed[i][j] = 1
+			}
+		}
+	}
+	return changed
 }
 
-// main method
+func printMatrx(matrix [3][3]int) {
+	for i := 0; i < 3; i++ {
+		fmt.Println(matrix[i])
+	}
+}
+
 func main() {
+	matrix := [3][3]int{
+		{1, 0, 0},
+		{0, 0, 0},
+		{0, 0, 0},
+	}
+	printMatrx(matrix)
+	changed := changeMatrix(matrix)
+	printMatrx(changed)
 
-	matrix := [3][3]int{{1, 0, 0}, {0, 0, 0}, {0, 0, 0}}
-	printMatrix(matrix)
-
-	matrix = changeMatrix(matrix)
-
-	printMatrix(matrix)
 }
 
