@@ -35,10 +35,9 @@ func main() {
 	table.Rows = make([]Row, 2)
 
 	row1 := Row{}
-	row1.column = make([]Column, 3)
+	row1.column = make([]Column, 2)
 	row1.column[0] = Column{"1", "01"}
 	row1.column[1] = Column{"1", "Kyungsub Kim"}
-	row1.column[2] = Column{"1", "01062888587"}
 
 	row2 := Row{}
 	row2.column = make([]Column, 3)
@@ -51,4 +50,3 @@ func main() {
 	printTable(table)
 
 }
-

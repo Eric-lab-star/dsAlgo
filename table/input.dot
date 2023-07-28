@@ -1,0 +1,41 @@
+digraph {
+    graph [pad="0.5", nodesep="0.5", ranksep="2"];
+    node [shape=plain]
+    
+    {rank=same Foo Baz}
+
+
+Foo [label=<
+<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+  <tr><td><i>Rows</i></td></tr>
+  <tr><td port="1">R1</td></tr>
+  <tr><td port="2">R2</td></tr>
+</table>>];
+
+
+
+Baz [label=<
+<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+  <tr>
+    <td><i>Id</i></td>
+    <td><i>Name</i></td>
+    <td><i>PhonNumber</i></td>
+  </tr>
+  <tr>
+    <td port="c1">1</td>
+    <td port="c1">Kim</td>
+    <td port="c1">101202220303</td>
+   </tr>
+  <tr>
+    <td port="c2">2</td>
+    <td port="c2">Lee</td>
+    <td port="c2">301010101010</td>
+  </tr>
+</table>>];
+
+Foo:1 -> Baz:c1;
+Foo:2 -> Baz:c2;
+
+
+}
+
